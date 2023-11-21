@@ -7,19 +7,31 @@ package com.example.security01.config.auth;
 // User 오브젝트타입 => UserDetails 타입 객체
 
 import com.example.security01.model.User;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
+@Data
 // Security Session => Authentication => UserDetails(PrincipalDetails)
-public class PrincipalDetails implements UserDetails
+public class PrincipalDetails implements UserDetails, OAuth2User
 {
     private User user; // 콤포지션
+    private Map<String, Object> attributes;
 
+    // 일반로그인
     public PrincipalDetails(final User user) {
         this.user = user;
+    }
+
+    // OAuth 로그인
+    public PrincipalDetails(final User user, final Map<String, Object> attributes) {
+        this.user = user;
+        this.attributes = attributes;
     }
 
     // 해당 User 의 권한을 리턴하는 곳!
@@ -62,5 +74,15 @@ public class PrincipalDetails implements UserDetails
         // 현재시간 - 로그인 시간 => 1년을 초과하면 return false;
 
         return true;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }
